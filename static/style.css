@@ -12,10 +12,11 @@ body {
 }
 
 input, button {
-    padding: 10px 7px;
+    padding: 5px 5px;
     margin: 5px 0;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 8px;
+    margin-left: 8px;
 }
 
 button {
@@ -29,14 +30,32 @@ button:hover {
     background-color: #218838;
 }
 
+.btn {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn .primary {
+    background-color: #007bff;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
 
 h1 {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 
 form {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 input[type="submit"] {
@@ -44,6 +63,9 @@ input[type="submit"] {
     color: white;
     border: none;
     cursor: pointer;
+    padding: 10px 25px;
+    border-radius: 4px;
+    margin-top: 25px;
 }
 
 input[type="submit"]:hover {
@@ -51,12 +73,18 @@ input[type="submit"]:hover {
 }
 
 .container {
-    max-width: 600px;
+    max-width: 800px;
     margin: auto;
     background: white;
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.container-flex {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 .center {
@@ -65,4 +93,59 @@ input[type="submit"]:hover {
     align-items: center;
     width: 100%;
     height: 100%;
+}
+
+.wrap {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.title {
+    flex-basis: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.top-info {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.info-list {
+    list-style-type: none;
+    padding: 0;
+    padding-left: 10px;
+}
+
+.info-list li {
+    padding: 2px 7px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.info-list li:last-child {
+    border-bottom: none;
+}
+
+/* even odd coloring */
+.info-list ul {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+.info-list ul li:nth-child(odd) {
+    background-color: #e4dfdf;
+}
+
+.info-list ul li:nth-child(even) {
+    background-color: #fff;
 }

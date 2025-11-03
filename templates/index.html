@@ -1,5 +1,32 @@
 {% extends 'base.html' %}
-{% from 'bootstrap5/form.html' import render_form %}
 {% block content %}
-  {{ render_form(form) }}
+  <div class="container container-flex">
+    <div class="top-info">
+      <h1> Flask Pdf Test </h1>
+      <p> Use the navigation menu to upload your information. </p>
+    </div>
+
+    <a href="{{ url_for('add_info') }}" class="btn btn-primary">Click To Upload Information</a>
+
+    <div class="info-list">
+      <h2> Submitted Informations ({{ infos|length }}) </h2>
+      {% if infos %}
+        <ul>
+          {% for info in infos %}
+            <li>
+              <p>{{ info.first_name }} {{ info.last_name }} - {{ info.home_address }} (ID: {{ info.id }}) </p>
+              <div>
+                <form method="POST" action="{{ url_for('generate_pdf', info_id=info.id) }}">
+                  {{ pdf_generation_form.hidden_tag() }}
+                  {{ pdf_generation_form.submit(class="btn btn-success") }}
+                </form>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No information submitted yet.</p>
+      {% endif %}
+
+  </div>
 {% endblock %}

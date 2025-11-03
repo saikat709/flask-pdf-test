@@ -4,7 +4,7 @@ from sqlalchemy import text
 
 from flask_bootstrap import Bootstrap5
 from flask_wtf import FlaskForm, CSRFProtect
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Length
 
 import dotenv
@@ -25,6 +25,10 @@ db = SQLAlchemy(app)
 bootstrap = Bootstrap5(app)
 csrf = CSRFProtect(app)
 
+
+class PDFGenerationForm(FlaskForm):
+    submit = SubmitField('Generate PDF')
+
 class InformationForm(FlaskForm):
     first_name = StringField('First Name', validators=[DataRequired(), Length(max=100, min=4)])
     last_name = StringField('Last Name', validators=[DataRequired(), Length(max=100, min=4)])
@@ -44,6 +48,11 @@ class InformationForm(FlaskForm):
     foreign_province = StringField('Foreign Province', validators=[Length(max=100)])
     foreign_postal_code = StringField('Foreign Postal Code', validators=[Length(max=20, min=4)])
 
+    presidential_election_campaign = BooleanField('Presidential Election Campaign', default=False)
+    presidential_election_campaign_spouse = BooleanField('Presidential Election Campaign Spouse', default=False)
+
+    submit = SubmitField('Submit')
+
 
 
 class Information(db.Model):
@@ -62,21 +71,58 @@ class Information(db.Model):
     foreign_country_name = db.Column(db.String(100), nullable=True)
     foreign_province = db.Column(db.String(100), nullable=True)
     foreign_postal_code = db.Column(db.String(20), nullable=True)
+    presidential_election_campaign = db.Column(db.Boolean, default=False)
+    presidential_election_campaign_spouse = db.Column(db.Boolean, default=False)
+
+    def __repr__(self):
+        return f"<Information {self.id}: {self.first_name} {self.last_name}>"
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
+    infos = Information.query.all()
+    pdf_generation_form = PDFGenerationForm()
+    print(infos)
+    return render_template('index.html', infos=infos, pdf_generation_form=pdf_generation_form)
+
+
+@app.route('/add-info', methods=['GET', 'POST'])
+def add_info():
     form = InformationForm()
     if form.validate_on_submit():
         new_info = Information(
-            name=form.name.data,
-            price=form.price.data,
-            city=form.city.data
+            first_name=form.first_name.data,
+            last_name=form.last_name.data,
+            spouse_first_name=form.spouse_first_name.data,
+            spouse_last_name=form.spouse_last_name.data,
+            social_security_number=form.social_security_number.data,
+            spouse_social_security_number=form.spouse_social_security_number.data,
+            home_address=form.home_address.data,
+            apt_no=form.apt_no.data,
+            town=form.town.data,
+            state=form.state.data,
+            zip_code=form.zip_code.data,
+            foreign_country_name=form.foreign_country_name.data,
+            foreign_province=form.foreign_province.data,
+            foreign_postal_code=form.foreign_postal_code.data,
+            presidential_election_campaign=form.presidential_election_campaign.data,
+            presidential_election_campaign_spouse=form.presidential_election_campaign_spouse.data,
         )
         db.session.add(new_info)
         db.session.commit()
-        return redirect(url_for('index'))
-    return render_template('index.html', form=form)
+        return redirect(url_for('add_info'))
+    return render_template('add-info.html', form=form)
+
+
+
+@app.route('/generate-pdf/<int:info_id>', methods=['POST'])
+def generate_pdf(info_id):
+    info = Information.query.get(info_id)
+    if not info:
+        return "Information not found", 404
+
+    # PDF generation logic goes here
+    return "PDF generation logic goes here"
 
 
 if __name__ == '__main__':
@@ -84,7 +130,7 @@ if __name__ == '__main__':
         try:
             db.session.execute(text('SELECT 1'))
             # db.create_all()
-            print('\n\n----------- Connection successful !')
+            print('----------Connection successful !------------')
         except Exception as e:
-            print('\n\n----------- Connection failed ! ERROR : ', e)
+            print('[Error] Connection failed ! ', e)
     app.run(debug=True)

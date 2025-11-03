@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% from 'bootstrap5/form.html' import render_form %}
+
+{% block content %}
+  <form class="container wrap" method="POST" action="">
+    {{ form.hidden_tag() }}
+    <h2 class="title"> Upload Information </h2>
+    {{ render_form(form) }}
+  </form>
+  <div class="container">
+    <a href="{{ url_for('index') }}" class="btn btn-secondary"> < Back to Home</a>
+  </div>
+{% endblock %}
