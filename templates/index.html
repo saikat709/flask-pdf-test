@@ -1,10 +1,5 @@
+{% extends 'base.html' %}
 {% from 'bootstrap5/form.html' import render_form %}
-<html>
-  <head>
-    <title>Flask Pdf Test</title>
-  </head>
-  <body>
-    <h1> Flask Pdf Test </h1>
-    {{ render_form(form) }}
-  </body>
-</html>s
+{% block content %}
+  {{ render_form(form) }}
+{% endblock %}
