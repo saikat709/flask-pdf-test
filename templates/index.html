@@ -2,8 +2,8 @@
 {% block content %}
   <div class="container container-flex">
     <div class="top-info">
-      <h1> Flask Pdf Test </h1>
-      <p> Use the navigation menu to upload your information. </p>
+      <h1> Flask-Pdf InternShip Test </h1>
+      <p> You can add info and generate PDFs for uploaded infos. </p>
     </div>
 
     <a href="{{ url_for('add_info') }}" class="btn btn-primary">Click To Upload Information</a>
@@ -14,18 +14,22 @@
         <ul>
           {% for info in infos %}
             <li>
-              <p>{{ info.first_name }} {{ info.last_name }} - {{ info.home_address }} (ID: {{ info.id }}) </p>
-              <div>
+              <p> <strong> [ID: {{ info.id }}] </strong> {{ info.first_name }} {{ info.last_name }} - {{ info.home_address }} </p>
+              <div class="flex">
                 <form method="POST" action="{{ url_for('generate_pdf', info_id=info.id) }}">
                   {{ pdf_generation_form.hidden_tag() }}
                   {{ pdf_generation_form.submit(class="btn btn-success") }}
+                </form>
+                <form method="POST" action="{{ url_for('delete_info', info_id=info.id) }}">
+                  {{ info_delete_form.hidden_tag() }}
+                  {{ info_delete_form.submit(class="btn btn-danger") }}
                 </form>
               </div>
             </li>
           {% endfor %}
         </ul>
       {% else %}
-        <p>No information submitted yet.</p>
+        <p class="info-message">No information submitted yet.</p>
       {% endif %}
 
   </div>

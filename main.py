@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, send_file
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 
@@ -9,6 +9,9 @@ from wtforms.validators import DataRequired, Length
 
 import dotenv
 import os
+
+# from pdf_updating import generate_filled_pdf
+import pdf_updating
 
 dotenv.load_dotenv()
 
@@ -29,14 +32,17 @@ csrf = CSRFProtect(app)
 class PDFGenerationForm(FlaskForm):
     submit = SubmitField('Generate PDF')
 
+class InfoDeleteForm(FlaskForm):
+    submit = SubmitField('Delete')
+
 class InformationForm(FlaskForm):
     first_name = StringField('First Name', validators=[DataRequired(), Length(max=100, min=4)])
     last_name = StringField('Last Name', validators=[DataRequired(), Length(max=100, min=4)])
     spouse_first_name = StringField('Spouse First Name', validators=[DataRequired(), Length(max=100, min=4)])
-    spouse_last_name = StringField('Spouse Last Name', validators=[DataRequired(), Length(max=100, min=4)])
+    spouse_last_name = StringField('Last Name', validators=[DataRequired(), Length(max=100, min=4)])
 
     social_security_number = StringField('Social Security Number', validators=[DataRequired(), Length(max=11, min=9)])
-    spouse_social_security_number = StringField('Spouse Social Security Number', validators=[DataRequired(), Length(max=11, min=9)])
+    spouse_social_security_number = StringField('For Spouse', validators=[DataRequired(), Length(max=11, min=9)])
 
     home_address = StringField('Home Address', validators=[DataRequired(), Length(max=200, min=4)])
     apt_no = StringField('Apt No', validators=[Length(max=20)])
@@ -82,8 +88,13 @@ class Information(db.Model):
 def index():
     infos = Information.query.all()
     pdf_generation_form = PDFGenerationForm()
-    print(infos)
-    return render_template('index.html', infos=infos, pdf_generation_form=pdf_generation_form)
+    info_delete_form = InfoDeleteForm()
+    # print(infos)
+    return render_template('index.html', 
+                           infos=infos, 
+                           pdf_generation_form=pdf_generation_form, 
+                           info_delete_form=info_delete_form
+                        )
 
 
 @app.route('/add-info', methods=['GET', 'POST'])
@@ -110,7 +121,7 @@ def add_info():
         )
         db.session.add(new_info)
         db.session.commit()
-        return redirect(url_for('add_info'))
+        return redirect(url_for('index'))
     return render_template('add-info.html', form=form)
 
 
@@ -121,8 +132,25 @@ def generate_pdf(info_id):
     if not info:
         return "Information not found", 404
 
-    # PDF generation logic goes here
-    return "PDF generation logic goes here"
+    buffer = pdf_updating.populate_form_info(info)
+    download_name = f"{info.first_name}_{info.last_name}_document.pdf"
+    return send_file(
+        buffer,
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name=download_name
+    )
+
+
+@app.route('/delete-info/<int:info_id>', methods=['POST'])
+def delete_info(info_id):
+    info = Information.query.get(info_id)
+    if not info:
+        return "Information not found", 404
+
+    db.session.delete(info)
+    db.session.commit()
+    return redirect(url_for('index'))
 
 
 if __name__ == '__main__':
